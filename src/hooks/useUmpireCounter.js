@@ -18,6 +18,9 @@ export function useUmpireCounter() {
   // History of past overs for match review log
   const [pastOvers, setPastOvers] = useState([]);
 
+  // Track last ball type to show Run Out button after NB/WD
+  const [lastBallType, setLastBallType] = useState(null);
+
   // Undo stack
   const [historyStack, setHistoryStack] = useState([]);
 
@@ -38,6 +41,7 @@ export function useUmpireCounter() {
           setCurrentOverBalls(parsed.currentOverBalls || []);
           setPastOvers(parsed.pastOvers || []);
           setHistoryStack(parsed.historyStack || []);
+          setLastBallType(parsed.lastBallType || null);
         }
       }
     } catch (e) {
@@ -75,10 +79,11 @@ export function useUmpireCounter() {
       legalBallsInOver,
       totalWickets,
       currentOverBalls: [...currentOverBalls],
-      pastOvers: [...pastOvers]
+      pastOvers: [...pastOvers],
+      lastBallType
     };
     setHistoryStack((prev) => [...prev, snapshot]);
-  }, [completedOvers, legalBallsInOver, totalWickets, currentOverBalls, pastOvers]);
+  }, [completedOvers, legalBallsInOver, totalWickets, currentOverBalls, pastOvers, lastBallType]);
 
   // Setup match configuration
   const startMatch = (overs, wickets, title = 'Cricket Match') => {
@@ -91,6 +96,7 @@ export function useUmpireCounter() {
     setCurrentOverBalls([]);
     setPastOvers([]);
     setHistoryStack([]);
+    setLastBallType(null);
     setIsConfigured(true);
   };
 
@@ -99,6 +105,7 @@ export function useUmpireCounter() {
     saveSnapshot();
     const newBall = { id: Date.now(), type: 'LEGAL', label: '●' };
     const updatedBalls = [...currentOverBalls, newBall];
+    setLastBallType('LEGAL');
 
     if (legalBallsInOver + 1 === 6) {
       // Over complete
@@ -119,6 +126,7 @@ export function useUmpireCounter() {
     saveSnapshot();
     const newBall = { id: Date.now(), type: 'WD', label: 'WD' };
     setCurrentOverBalls((prev) => [...prev, newBall]);
+    setLastBallType('WD');
     return { overCompleted: false };
   }, [saveSnapshot]);
 
@@ -127,15 +135,31 @@ export function useUmpireCounter() {
     saveSnapshot();
     const newBall = { id: Date.now(), type: 'NB', label: 'NB' };
     setCurrentOverBalls((prev) => [...prev, newBall]);
+    setLastBallType('NB');
     return { overCompleted: false };
   }, [saveSnapshot]);
 
-  // Add Wicket (W)
+  // Add Run Out Wicket on NB/WD - Only wicket count goes up, NO new ball, NO legal ball count change
+  const addRunOutWicket = useCallback(() => {
+    saveSnapshot();
+    // Mark the last ball in currentOverBalls with a RUN OUT suffix (visual indicator)
+    setCurrentOverBalls((prev) => {
+      if (prev.length === 0) return prev;
+      const last = { ...prev[prev.length - 1], label: prev[prev.length - 1].label + '+RO', runOut: true };
+      return [...prev.slice(0, -1), last];
+    });
+    setTotalWickets((prev) => Math.min(maxWickets, prev + 1));
+    setLastBallType('LEGAL'); // After run out, next delivery is a fresh ball
+    return { overCompleted: false };
+  }, [saveSnapshot, maxWickets]);
+
+  // Add Wicket (W) - counts as a legal ball
   const addWicket = useCallback(() => {
     saveSnapshot();
     const newBall = { id: Date.now(), type: 'WICKET', label: 'W' };
     const updatedBalls = [...currentOverBalls, newBall];
     setTotalWickets((prev) => Math.min(maxWickets, prev + 1));
+    setLastBallType('LEGAL');
 
     if (legalBallsInOver + 1 === 6) {
       // Over complete on wicket
@@ -161,6 +185,7 @@ export function useUmpireCounter() {
     setTotalWickets(previousState.totalWickets);
     setCurrentOverBalls(previousState.currentOverBalls);
     setPastOvers(previousState.pastOvers);
+    setLastBallType(previousState.lastBallType || null);
 
     setHistoryStack((prev) => prev.slice(0, -1));
     return true;
@@ -183,6 +208,7 @@ export function useUmpireCounter() {
     setCurrentOverBalls([]);
     setPastOvers([]);
     setHistoryStack([]);
+    setLastBallType(null);
   }, []);
 
   // Display formats
@@ -190,6 +216,8 @@ export function useUmpireCounter() {
   const totalBallsBowled = (completedOvers * 6) + legalBallsInOver;
   const maxMatchBalls = maxOvers * 6;
   const isInningsCompleted = totalBallsBowled >= maxMatchBalls || totalWickets >= maxWickets;
+  // Run Out button should only show after a NB or WD
+  const canRunOut = lastBallType === 'NB' || lastBallType === 'WD';
 
   return {
     isConfigured,
@@ -202,6 +230,7 @@ export function useUmpireCounter() {
     currentOverBalls,
     pastOvers,
     canUndo: historyStack.length > 0,
+    canRunOut,
     formattedOvers,
     isInningsCompleted,
     startMatch,
@@ -209,6 +238,7 @@ export function useUmpireCounter() {
     addWide,
     addNoBall,
     addWicket,
+    addRunOutWicket,
     undo,
     resetCurrentOver,
     resetMatch

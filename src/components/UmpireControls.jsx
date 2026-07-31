@@ -7,8 +7,10 @@ export function UmpireControls({
   onWide,
   onNoBall,
   onWicket,
+  onRunOutWicket,
   onUndo,
   canUndo,
+  canRunOut,
   isLocked,
   isInningsCompleted
 }) {
@@ -43,6 +45,12 @@ export function UmpireControls({
     if (res?.overCompleted) {
       vibrateOverComplete();
     }
+  };
+
+  const handleRunOut = () => {
+    if (isLocked || isInningsCompleted) return;
+    vibrateWicket();
+    onRunOutWicket();
   };
 
   const handleUndo = () => {
@@ -111,6 +119,19 @@ export function UmpireControls({
           <span className="text-[10px] font-extrabold uppercase tracking-tight text-red-200">+1 WICKET</span>
         </button>
       </div>
+
+      {/* RUN OUT on NB/WD — contextual alert button */}
+      {canRunOut && !isLocked && !isInningsCompleted && (
+        <div className="animate-pulse">
+          <button
+            onClick={handleRunOut}
+            className="w-full py-4 rounded-2xl border-2 border-dashed border-rose-400 bg-rose-950/40 text-rose-300 font-black text-sm flex items-center justify-center gap-2 transition-all btn-tactile hover:bg-rose-900/50 glow-wicket"
+          >
+            <span className="text-base">☠️</span>
+            <span>RUN OUT on NB / WD — +1 WICKET (No Ball Count)</span>
+          </button>
+        </div>
+      )}
 
       {/* Undo Action Bar */}
       <div className="pt-1">

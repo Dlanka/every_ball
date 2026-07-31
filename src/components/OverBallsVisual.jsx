@@ -5,7 +5,10 @@ export function OverBallsVisual({ currentOverBalls, legalBallsInOver }) {
   const totalSlots = Math.max(6, currentOverBalls.length);
   const slots = Array.from({ length: totalSlots });
 
-  const getBallBadgeStyle = (type) => {
+  const getBallBadgeStyle = (type, runOut) => {
+    if (runOut) {
+      return 'bg-rose-700 text-white font-black border-rose-400 glow-wicket scale-105';
+    }
     switch (type) {
       case 'LEGAL':
         return 'bg-emerald-500 text-slate-950 font-black border-emerald-400 glow-dot scale-105';
@@ -37,14 +40,21 @@ export function OverBallsVisual({ currentOverBalls, legalBallsInOver }) {
         {slots.map((_, index) => {
           const ball = currentOverBalls[index];
           if (ball) {
+            // Clean display: NB+RO shows as two lines, others single label
+            const displayLabel = ball.runOut
+              ? ball.label.replace('+RO', '')
+              : ball.label;
             return (
               <div
                 key={ball.id || index}
-                className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl border flex items-center justify-center text-sm font-mono transition-all btn-tactile ${getBallBadgeStyle(
-                  ball.type
+                className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl border flex flex-col items-center justify-center text-[11px] font-mono transition-all btn-tactile ${getBallBadgeStyle(
+                  ball.type, ball.runOut
                 )}`}
               >
-                {ball.label}
+                <span>{displayLabel}</span>
+                {ball.runOut && (
+                  <span className="text-[8px] font-black leading-none text-rose-200">RO</span>
+                )}
               </div>
             );
           }

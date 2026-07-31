@@ -54,8 +54,10 @@ export default function App() {
           onWide={counter.addWide}
           onNoBall={counter.addNoBall}
           onWicket={counter.addWicket}
+          onRunOutWicket={counter.addRunOutWicket}
           onUndo={counter.undo}
           canUndo={counter.canUndo}
+          canRunOut={counter.canRunOut}
           isLocked={isLocked}
           isInningsCompleted={counter.isInningsCompleted}
         />
