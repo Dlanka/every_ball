@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-umpire-dark text-slate-100 font-sans select-none antialiased min-h-screen overscroll-none touch-manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Tactile press effects */
+.btn-tactile {
+  @apply transition-all duration-75 active:scale-95 active:brightness-125 shadow-lg;
+}
+
+/* Custom glowing effects for high contrast */
+.glow-accent {
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+}
+
+.glow-wicket {
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+}
+
+.glow-dot {
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.4);
+}
