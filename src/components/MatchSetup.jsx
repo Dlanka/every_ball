@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Play, Settings2, Trophy, Flame } from 'lucide-react';
+import { ShieldCheck, Play, Settings2, Trophy, Flame, Target } from 'lucide-react';
 import { useHaptics } from '../hooks/useHaptics';
 
 export function MatchSetup({ onStart }) {
@@ -8,6 +8,7 @@ export function MatchSetup({ onStart }) {
   const [wickets, setWickets] = useState(10);
   const [matchTitle, setMatchTitle] = useState('T20 Match');
   const [activePreset, setActivePreset] = useState('t20');
+  const [targetInput, setTargetInput] = useState(''); // empty = no target (1st innings)
 
   const presets = [
     { id: 't20', title: 'T20 Match', overs: 20, wickets: 10, icon: Flame, color: 'from-amber-500 to-red-600' },
@@ -28,7 +29,8 @@ export function MatchSetup({ onStart }) {
     e.preventDefault();
     vibrateTap();
     if (overs > 0 && wickets > 0) {
-      onStart(overs, wickets, matchTitle);
+      const target = targetInput.trim() !== '' ? parseInt(targetInput, 10) : null;
+      onStart(overs, wickets, matchTitle, target);
     }
   };
 
@@ -154,6 +156,42 @@ export function MatchSetup({ onStart }) {
               placeholder="e.g. Finals / Innings 1"
               className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-sm focus:border-sky-400 focus:outline-none"
             />
+          </div>
+
+          {/* Target Score (2nd Innings) */}
+          <div className="pt-2 border-t border-slate-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="w-4 h-4 text-amber-400" />
+              <label className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                Target Score
+                <span className="ml-1 text-slate-500 font-normal normal-case">(2nd innings only)</span>
+              </label>
+            </div>
+            <div className="flex gap-2 items-center">
+              <input
+                type="number"
+                min="1"
+                max="999"
+                value={targetInput}
+                onChange={(e) => setTargetInput(e.target.value)}
+                placeholder="Leave blank for 1st innings"
+                className="flex-1 bg-slate-900 border border-amber-800/50 rounded-xl px-3 py-2.5 text-slate-200 text-sm focus:border-amber-400 focus:outline-none placeholder:text-slate-600 font-mono"
+              />
+              {targetInput && (
+                <button
+                  type="button"
+                  onClick={() => setTargetInput('')}
+                  className="px-3 py-2.5 rounded-xl border border-slate-700 text-slate-400 text-xs font-bold hover:border-slate-600 btn-tactile"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            {targetInput && (
+              <p className="text-[11px] text-amber-400/80 mt-1.5 font-semibold">
+                🏏 Chasing {targetInput} — Need {parseInt(targetInput) + 1} runs to win
+              </p>
+            )}
           </div>
         </div>
 

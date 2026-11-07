@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const STORAGE_KEY = 'umpire_counter_match_state_v2';
+const STORAGE_KEY = 'umpire_counter_match_state_v3';
 
 export function useUmpireCounter() {
   // Config State
@@ -8,6 +8,7 @@ export function useUmpireCounter() {
   const [maxOvers, setMaxOvers] = useState(20);
   const [maxWickets, setMaxWickets] = useState(10);
   const [matchTitle, setMatchTitle] = useState('T20 Match');
+  const [targetScore, setTargetScore] = useState(null); // null = no target (1st innings)
 
   // Match State
   const [totalRuns, setTotalRuns] = useState(0);
@@ -36,6 +37,7 @@ export function useUmpireCounter() {
           setMaxOvers(p.maxOvers ?? 20);
           setMaxWickets(p.maxWickets ?? 10);
           setMatchTitle(p.matchTitle ?? 'Cricket Match');
+          setTargetScore(p.targetScore ?? null);
           setTotalRuns(p.totalRuns ?? 0);
           setCompletedOvers(p.completedOvers ?? 0);
           setLegalBallsInOver(p.legalBallsInOver ?? 0);
@@ -55,7 +57,7 @@ export function useUmpireCounter() {
     if (!isConfigured) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        isConfigured, maxOvers, maxWickets, matchTitle,
+        isConfigured, maxOvers, maxWickets, matchTitle, targetScore,
         totalRuns, completedOvers, legalBallsInOver, totalWickets,
         currentOverBalls, pastOvers, historyStack, lastBallType,
       }));
@@ -63,7 +65,7 @@ export function useUmpireCounter() {
       console.error('Failed to save state:', e);
     }
   }, [
-    isConfigured, maxOvers, maxWickets, matchTitle,
+    isConfigured, maxOvers, maxWickets, matchTitle, targetScore,
     totalRuns, completedOvers, legalBallsInOver, totalWickets,
     currentOverBalls, pastOvers, historyStack, lastBallType,
   ]);
@@ -95,10 +97,11 @@ export function useUmpireCounter() {
 
   // ─── Match Setup ──────────────────────────────────────────────────────────
 
-  const startMatch = (overs, wickets, title = 'Cricket Match') => {
+  const startMatch = (overs, wickets, title = 'Cricket Match', target = null) => {
     setMaxOvers(Number(overs));
     setMaxWickets(Number(wickets));
     setMatchTitle(title);
+    setTargetScore(target ? Number(target) : null);
     setTotalRuns(0);
     setCompletedOvers(0);
     setLegalBallsInOver(0);
@@ -113,6 +116,7 @@ export function useUmpireCounter() {
   const resetMatch = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setIsConfigured(false);
+    setTargetScore(null);
     setTotalRuns(0);
     setCompletedOvers(0);
     setLegalBallsInOver(0);
@@ -209,15 +213,24 @@ export function useUmpireCounter() {
   const maxMatchBalls = maxOvers * 6;
   const isInningsCompleted = totalBallsBowled >= maxMatchBalls || totalWickets >= maxWickets;
 
+  // ─── Target / Chase ───────────────────────────────────────────────────────
+  const hasTarget = targetScore !== null && targetScore > 0;
+  const runsNeeded = hasTarget ? Math.max(0, targetScore - totalRuns) : null;
+  const ballsRemaining = maxMatchBalls - totalBallsBowled;
+  const isChaseWon = hasTarget && totalRuns >= targetScore;
+  const isChaseLost = hasTarget && isInningsCompleted && !isChaseWon;
+
   return {
     // Config
-    isConfigured, maxOvers, maxWickets, matchTitle,
+    isConfigured, maxOvers, maxWickets, matchTitle, targetScore,
     // Match state
     totalRuns, completedOvers, legalBallsInOver, totalWickets,
     currentOverBalls, pastOvers,
     // Computed
     formattedOvers, isInningsCompleted,
     canUndo: historyStack.length > 0,
+    // Target / Chase
+    hasTarget, runsNeeded, ballsRemaining, isChaseWon, isChaseLost,
     // Actions
     startMatch, resetMatch, resetCurrentOver,
     addLegalBall, addWide, addNoBall,

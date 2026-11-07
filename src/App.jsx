@@ -69,6 +69,12 @@ export default function App() {
           maxOvers={counter.maxOvers}
           maxWickets={counter.maxWickets}
           isInningsCompleted={counter.isInningsCompleted}
+          hasTarget={counter.hasTarget}
+          runsNeeded={counter.runsNeeded}
+          ballsRemaining={counter.ballsRemaining}
+          targetScore={counter.targetScore}
+          isChaseWon={counter.isChaseWon}
+          isChaseLost={counter.isChaseLost}
         />
 
         <OverBallsVisual
