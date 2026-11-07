@@ -3,7 +3,7 @@ import { AlertCircle, Target, Zap } from 'lucide-react';
 
 /**
  * Merged compact scoreboard + over balls + chase bar.
- * Designed to leave maximum vertical space for action buttons below.
+ * Scaled up for crystal-clear outdoor readability while keeping a single unified card.
  */
 export function ScoreDisplay({
   totalRuns,
@@ -27,7 +27,7 @@ export function ScoreDisplay({
   // Over balls badge style
   const getBadgeStyle = (ball) => {
     if (!ball) return 'bg-slate-900 border-dashed border-slate-800 text-slate-700';
-    if (ball.withWicket) return 'bg-rose-700 border-rose-400 text-white';
+    if (ball.withWicket) return 'bg-rose-700 border-rose-400 text-white glow-wicket';
     switch (ball.type) {
       case 'LEGAL':
         if (ball.runs >= 4) return 'bg-emerald-500 border-emerald-300 text-slate-950';
@@ -35,7 +35,7 @@ export function ScoreDisplay({
         return 'bg-slate-700 border-slate-600 text-slate-300';
       case 'WD':  return 'bg-amber-500 border-amber-300 text-slate-950';
       case 'NB':  return 'bg-pink-600 border-pink-400 text-white';
-      case 'WICKET': return 'bg-rose-600 border-rose-400 text-white';
+      case 'WICKET': return 'bg-rose-600 border-rose-400 text-white glow-wicket';
       default:    return 'bg-slate-900 border-slate-800 text-slate-400';
     }
   };
@@ -50,7 +50,7 @@ export function ScoreDisplay({
     : 0;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 shrink-0">
 
       {/* ── Banner (Chase won / Innings over) ────────────────── */}
       {(isChaseWon || isInningsCompleted) && (
@@ -62,7 +62,7 @@ export function ScoreDisplay({
           {isChaseWon
             ? <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
             : <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />}
-          <span className={`text-[11px] font-black uppercase tracking-widest ${isChaseWon ? 'text-emerald-300' : 'text-amber-300'}`}>
+          <span className={`text-xs font-black uppercase tracking-widest ${isChaseWon ? 'text-emerald-300' : 'text-amber-300'}`}>
             {isChaseWon
               ? 'TARGET REACHED! 🏆'
               : isChaseLost
@@ -79,22 +79,30 @@ export function ScoreDisplay({
         <div className={`grid gap-0 divide-x divide-slate-800 ${hasTarget && !isChaseWon ? 'grid-cols-3' : 'grid-cols-2'}`}>
 
           {/* RUNS */}
-          <div className="px-3 py-2.5 flex flex-col gap-0.5">
-            <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">RUNS</span>
-            <span className="text-4xl font-black font-mono text-white leading-none">{totalRuns}</span>
-            <span className="text-[9px] text-slate-600 font-bold uppercase">TOTAL SCORE</span>
+          <div className="px-3.5 py-2.5 flex flex-col justify-between">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">RUNS</span>
+            <div className="py-0.5">
+              <span className="text-5xl font-black font-mono text-white tracking-tight leading-none">
+                {totalRuns}
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">TOTAL SCORE</span>
           </div>
 
           {/* WICKETS */}
-          <div className="px-3 py-2.5 flex flex-col gap-0.5">
+          <div className="px-3.5 py-2.5 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">WKTS</span>
-              <span className="text-[8px] font-black text-rose-400 bg-rose-950/60 px-1.5 py-0.5 rounded-full border border-rose-900">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">WKTS</span>
+              <span className="text-[9px] font-black text-rose-400 bg-rose-950/70 px-2 py-0.5 rounded-full border border-rose-900/60 font-mono">
                 /{maxWickets}
               </span>
             </div>
-            <span className="text-4xl font-black font-mono text-rose-500 leading-none">{totalWickets}</span>
-            <div className="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
+            <div className="py-0.5">
+              <span className="text-5xl font-black font-mono text-rose-500 tracking-tight leading-none">
+                {totalWickets}
+              </span>
+            </div>
+            <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800/60">
               <div
                 className="bg-gradient-to-r from-rose-500 to-red-600 h-full transition-all"
                 style={{ width: `${Math.min(100, (totalWickets / maxWickets) * 100)}%` }}
@@ -104,17 +112,21 @@ export function ScoreDisplay({
 
           {/* CHASE (only if target set and not won) */}
           {hasTarget && !isChaseWon && (
-            <div className={`px-3 py-2.5 flex flex-col gap-0.5 ${isUrgent ? 'bg-rose-950/20' : 'bg-amber-950/10'}`}>
+            <div className={`px-3.5 py-2.5 flex flex-col justify-between ${isUrgent ? 'bg-rose-950/20' : 'bg-amber-950/15'}`}>
               <div className="flex items-center gap-1">
-                <Target className={`w-3 h-3 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`} />
-                <span className={`text-[9px] font-extrabold uppercase tracking-widest ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`}>
+                <Target className={`w-3.5 h-3.5 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`} />
+                <span className={`text-[10px] font-extrabold uppercase tracking-widest ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`}>
                   NEED
                 </span>
               </div>
-              <span className={`text-4xl font-black font-mono leading-none ${isUrgent ? 'text-rose-400' : 'text-amber-300'}`}>
-                {runsNeeded}
+              <div className="py-0.5">
+                <span className={`text-5xl font-black font-mono tracking-tight leading-none ${isUrgent ? 'text-rose-400' : 'text-amber-300'}`}>
+                  {runsNeeded}
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-mono">
+                {ballsRemaining}b left
               </span>
-              <span className="text-[9px] text-slate-500 font-bold uppercase">{ballsRemaining}b left</span>
             </div>
           )}
         </div>
@@ -123,31 +135,31 @@ export function ScoreDisplay({
         <div className="border-t border-slate-800" />
 
         {/* Row 2 — Overs + Ball Progress + (RRR if chase) */}
-        <div className="px-3 py-2 flex items-center justify-between gap-2">
+        <div className="px-3.5 py-2 flex items-center justify-between gap-2 bg-slate-950/40">
           {/* Overs */}
-          <div className="flex items-baseline gap-1 shrink-0">
-            <span className="text-lg font-black font-mono text-sky-300 leading-none">{formattedOvers}</span>
-            <span className="text-[10px] text-slate-500 font-bold">/ {maxOvers}.0 OV</span>
+          <div className="flex items-baseline gap-1.5 shrink-0">
+            <span className="text-2xl font-black font-mono text-sky-300 leading-none">{formattedOvers}</span>
+            <span className="text-xs text-slate-400 font-bold font-mono">/ {maxOvers}.0 OV</span>
           </div>
 
           {/* Ball dots */}
-          <div className="flex items-center gap-1 flex-1 justify-center">
+          <div className="flex items-center gap-1.5 flex-1 justify-center">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className={`w-3 h-3 rounded-full border transition-all ${
+                className={`w-3.5 h-3.5 rounded-full border transition-all ${
                   i < legalBallsInOver
-                    ? 'bg-emerald-400 border-emerald-300'
-                    : 'bg-slate-800 border-slate-700'
+                    ? 'bg-emerald-400 border-emerald-300 glow-dot shadow-sm'
+                    : 'bg-slate-800/80 border-slate-700'
                 }`}
               />
             ))}
-            <span className="text-[9px] text-slate-600 font-bold ml-1">{legalBallsInOver}/6</span>
+            <span className="text-[10px] text-slate-400 font-mono font-bold ml-1">{legalBallsInOver}/6</span>
           </div>
 
           {/* RRR (if chasing) */}
           {hasTarget && !isChaseWon && ballsRemaining > 0 && runsNeeded > 0 && (
-            <div className={`text-[10px] font-black font-mono shrink-0 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`}>
+            <div className={`text-xs font-black font-mono shrink-0 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`}>
               RRR {((runsNeeded / ballsRemaining) * 6).toFixed(1)}
             </div>
           )}
@@ -155,7 +167,7 @@ export function ScoreDisplay({
 
         {/* Chase progress bar (thin, bottom of card) */}
         {hasTarget && !isChaseWon && (
-          <div className={`h-1 w-full ${isUrgent ? 'bg-rose-950' : 'bg-amber-950/40'}`}>
+          <div className={`h-1.5 w-full ${isUrgent ? 'bg-rose-950' : 'bg-amber-950/40'}`}>
             <div
               className={`h-full transition-all duration-500 ${isUrgent ? 'bg-rose-500' : 'bg-amber-400'}`}
               style={{ width: `${runsNeededPercent}%` }}
@@ -167,23 +179,23 @@ export function ScoreDisplay({
         <div className="border-t border-slate-800" />
 
         {/* Row 3 — Current Over Balls */}
-        <div className="px-3 py-2">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 inline-block animate-pulse" />
+        <div className="px-3.5 py-2.5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-sky-400 inline-block animate-pulse" />
               CURRENT OVER
             </span>
-            <span className="text-[9px] font-mono text-slate-600">{currentOverBalls.length} deliveries</span>
+            <span className="text-[10px] font-mono text-slate-400 font-semibold">{currentOverBalls.length} deliveries</span>
           </div>
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5">
             {slots.map((_, i) => {
               const ball = currentOverBalls[i];
               return (
                 <div
                   key={ball ? ball.id : `e-${i}`}
-                  className={`shrink-0 w-9 h-9 rounded-lg border flex items-center justify-center font-mono font-black text-[10px] transition-all ${getBadgeStyle(ball)}`}
+                  className={`shrink-0 w-11 h-11 rounded-xl border flex items-center justify-center font-mono font-black text-xs transition-all ${getBadgeStyle(ball)}`}
                 >
-                  {ball ? ball.label : <span className="text-[10px] opacity-40">{i + 1}</span>}
+                  {ball ? ball.label : <span className="text-xs opacity-40">{i + 1}</span>}
                 </div>
               );
             })}

@@ -35,7 +35,7 @@ export function MatchSetup({ onStart }) {
   };
 
   return (
-    <div className="min-h-screen bg-umpire-dark flex flex-col justify-between p-4 sm:p-6 max-w-md mx-auto">
+    <div className="min-h-screen h-full overflow-y-auto bg-umpire-dark flex flex-col justify-between p-4 sm:p-6 max-w-md mx-auto pb-12">
       {/* Header */}
       <div className="text-center pt-4 pb-2">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-emerald-500 p-3 mb-3 shadow-lg glow-accent">

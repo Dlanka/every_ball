@@ -80,7 +80,7 @@ export default function App() {
         />
 
         {/* Action controls — take remaining space */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 flex flex-col min-h-0">
           <UmpireControls
             onLegalBall={handleLegalBall}
             onOpenExtra={handleOpenExtra}
