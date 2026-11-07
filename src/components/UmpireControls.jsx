@@ -67,14 +67,14 @@ export function UmpireControls({
         {wicketActive ? 'WICKET ACTIVE — SELECT BALL TYPE BELOW' : '+WICKET (TAP TO ARM)'}
       </button>
 
-      {/* Run Buttons Grid - balanced size, perfectly centered */}
+      {/* Run Buttons Grid - exactly 80px height, balanced and centered */}
       <div className="grid grid-cols-3 gap-2">
         {RUN_OPTIONS.map(({ runs, label, sub }) => (
           <button
             key={runs}
             disabled={disabled}
             onClick={() => handleLegal(runs)}
-            className={`flex flex-col items-center justify-center py-3.5 sm:py-4 rounded-2xl border font-black transition-all btn-tactile ${
+            className={`flex flex-col items-center justify-center h-[80px] rounded-2xl border font-black transition-all btn-tactile ${
               disabled
                 ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
                 : wicketActive
@@ -87,9 +87,9 @@ export function UmpireControls({
             }`}
           >
             {/* Number/label - centered */}
-            <span className="text-2xl sm:text-3xl font-black leading-none">{label}</span>
+            <span className="text-3xl font-black leading-none">{label}</span>
             {/* Fixed height sub/indicator row ensures exact vertical center across all buttons */}
-            <div className="h-3.5 flex items-center justify-center text-[10px] font-mono leading-none mt-1">
+            <div className="h-4 flex items-center justify-center text-[11px] font-mono leading-none mt-1.5">
               {wicketActive ? (
                 <span className="text-rose-300 font-black tracking-wide">+W</span>
               ) : sub ? (
@@ -100,13 +100,13 @@ export function UmpireControls({
         ))}
       </div>
 
-      {/* Extras Row */}
+      {/* Extras Row - matched proportion */}
       <div className="grid grid-cols-2 gap-2">
         {/* WIDE */}
         <button
           disabled={disabled}
           onClick={() => handleExtra('WD')}
-          className={`py-3 rounded-2xl border font-black flex flex-col items-center justify-center transition-all btn-tactile ${
+          className={`h-[72px] rounded-2xl border font-black flex flex-col items-center justify-center transition-all btn-tactile ${
             disabled
               ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
               : wicketActive
@@ -114,8 +114,8 @@ export function UmpireControls({
                 : 'bg-gradient-to-br from-amber-400 to-amber-500 border-amber-300 text-slate-950 hover:from-amber-300'
           }`}
         >
-          <span className="text-xl font-black leading-none">WD</span>
-          <div className="h-3.5 flex items-center justify-center text-[10px] font-extrabold uppercase tracking-tight text-amber-950 mt-1">
+          <span className="text-2xl font-black leading-none">WD</span>
+          <div className="h-4 flex items-center justify-center text-[10px] font-extrabold uppercase tracking-tight text-amber-950 mt-1.5">
             {wicketActive ? 'WIDE + RUN OUT' : 'WIDE BALL'}
           </div>
         </button>
@@ -124,7 +124,7 @@ export function UmpireControls({
         <button
           disabled={disabled}
           onClick={() => handleExtra('NB')}
-          className={`py-3 rounded-2xl border font-black flex flex-col items-center justify-center transition-all btn-tactile ${
+          className={`h-[72px] rounded-2xl border font-black flex flex-col items-center justify-center transition-all btn-tactile ${
             disabled
               ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
               : wicketActive
@@ -132,8 +132,8 @@ export function UmpireControls({
                 : 'bg-gradient-to-br from-pink-600 to-rose-600 border-pink-400 text-white hover:from-pink-500'
           }`}
         >
-          <span className="text-xl font-black leading-none">NB</span>
-          <div className="h-3.5 flex items-center justify-center text-[10px] font-extrabold uppercase tracking-tight text-pink-200 mt-1">
+          <span className="text-2xl font-black leading-none">NB</span>
+          <div className="h-4 flex items-center justify-center text-[10px] font-extrabold uppercase tracking-tight text-pink-200 mt-1.5">
             {wicketActive ? 'NO BALL + RUN OUT' : 'NO BALL'}
           </div>
         </button>
