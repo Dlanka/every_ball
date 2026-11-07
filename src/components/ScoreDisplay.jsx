@@ -2,8 +2,8 @@ import React from 'react';
 import { AlertCircle, Target, Zap } from 'lucide-react';
 
 /**
- * Merged compact scoreboard + over balls + chase bar.
- * Carefully balanced proportions so it stays compact and avoids vertical overflow.
+ * Merged scoreboard + over balls + chase bar.
+ * Designed with distinct gaps between RUNS, WICKETS and chase stats for fast on-field clarity.
  */
 export function ScoreDisplay({
   totalRuns,
@@ -50,18 +50,18 @@ export function ScoreDisplay({
     : 0;
 
   return (
-    <div className="space-y-1.5 shrink-0">
+    <div className="space-y-2 shrink-0">
 
       {/* ── Banner (Chase won / Innings over) ────────────────── */}
       {(isChaseWon || isInningsCompleted) && (
-        <div className={`rounded-xl p-1.5 text-center flex items-center justify-center gap-1.5 border ${
+        <div className={`rounded-xl p-2 text-center flex items-center justify-center gap-2 border ${
           isChaseWon
             ? 'bg-emerald-950/40 border-emerald-700/50'
             : 'bg-amber-950/30 border-amber-700/40 animate-pulse'
         }`}>
           {isChaseWon
-            ? <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            : <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+            ? <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
+            : <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />}
           <span className={`text-[11px] font-black uppercase tracking-widest ${isChaseWon ? 'text-emerald-300' : 'text-amber-300'}`}>
             {isChaseWon
               ? 'TARGET REACHED! 🏆'
@@ -75,11 +75,11 @@ export function ScoreDisplay({
       {/* ── Single Merged Card ───────────────────────────────── */}
       <div className="bg-umpire-card border border-umpire-border rounded-2xl shadow-lg overflow-hidden">
 
-        {/* Row 1 — Runs | Wickets | (Chase if target) */}
-        <div className={`grid gap-0 divide-x divide-slate-800 ${hasTarget && !isChaseWon ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        {/* Row 1 — Runs | Wickets | (Chase if target) with clear gaps */}
+        <div className={`grid gap-2.5 p-2.5 ${hasTarget && !isChaseWon ? 'grid-cols-3' : 'grid-cols-2'}`}>
 
-          {/* RUNS */}
-          <div className="px-3 py-2 flex flex-col justify-between">
+          {/* RUNS Tile */}
+          <div className="bg-slate-950/75 border border-slate-800/80 rounded-xl px-3 py-2 flex flex-col justify-between shadow-inner">
             <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">RUNS</span>
             <div className="py-0.5">
               <span className="text-4xl font-black font-mono text-white tracking-tight leading-none">
@@ -89,11 +89,11 @@ export function ScoreDisplay({
             <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">TOTAL SCORE</span>
           </div>
 
-          {/* WICKETS */}
-          <div className="px-3 py-2 flex flex-col justify-between">
+          {/* WICKETS Tile */}
+          <div className="bg-slate-950/75 border border-slate-800/80 rounded-xl px-3 py-2 flex flex-col justify-between shadow-inner">
             <div className="flex items-center justify-between">
               <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">WKTS</span>
-              <span className="text-[9px] font-black text-rose-400 bg-rose-950/70 px-1.5 py-0.5 rounded-full border border-rose-900/60 font-mono">
+              <span className="text-[9px] font-black text-rose-400 bg-rose-950/80 px-1.5 py-0.5 rounded-full border border-rose-900/60 font-mono">
                 /{maxWickets}
               </span>
             </div>
@@ -110,9 +110,11 @@ export function ScoreDisplay({
             </div>
           </div>
 
-          {/* CHASE (only if target set and not won) */}
+          {/* CHASE Tile (only if target set and not won) */}
           {hasTarget && !isChaseWon && (
-            <div className={`px-3 py-2 flex flex-col justify-between ${isUrgent ? 'bg-rose-950/20' : 'bg-amber-950/15'}`}>
+            <div className={`border rounded-xl px-3 py-2 flex flex-col justify-between shadow-inner ${
+              isUrgent ? 'bg-rose-950/25 border-rose-700/40' : 'bg-amber-950/20 border-amber-700/40'
+            }`}>
               <div className="flex items-center gap-1">
                 <Target className={`w-3 h-3 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`} />
                 <span className={`text-[9px] font-extrabold uppercase tracking-widest ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`}>
@@ -132,10 +134,10 @@ export function ScoreDisplay({
         </div>
 
         {/* Divider */}
-        <div className="border-t border-slate-800" />
+        <div className="border-t border-slate-800/80" />
 
         {/* Row 2 — Overs + Ball Progress + (RRR if chase) */}
-        <div className="px-3 py-1.5 flex items-center justify-between gap-2 bg-slate-950/40">
+        <div className="px-3.5 py-1.5 flex items-center justify-between gap-2 bg-slate-950/40">
           {/* Overs */}
           <div className="flex items-baseline gap-1 shrink-0">
             <span className="text-xl font-black font-mono text-sky-300 leading-none">{formattedOvers}</span>
@@ -176,10 +178,10 @@ export function ScoreDisplay({
         )}
 
         {/* Divider */}
-        <div className="border-t border-slate-800" />
+        <div className="border-t border-slate-800/80" />
 
         {/* Row 3 — Current Over Balls */}
-        <div className="px-3 py-1.5">
+        <div className="px-3.5 py-2">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-400 inline-block animate-pulse" />
