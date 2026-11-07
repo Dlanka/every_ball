@@ -47,7 +47,7 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen bg-umpire-dark text-slate-100 flex flex-col max-w-md mx-auto relative overflow-hidden">
+    <div className="h-[100dvh] bg-umpire-dark text-slate-100 flex flex-col max-w-md mx-auto relative overflow-hidden">
       <Header
         matchTitle={counter.matchTitle}
         maxOvers={counter.maxOvers}
