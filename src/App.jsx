@@ -47,7 +47,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-umpire-dark text-slate-100 flex flex-col max-w-md mx-auto relative">
+    <div className="h-screen bg-umpire-dark text-slate-100 flex flex-col max-w-md mx-auto relative overflow-hidden">
       <Header
         matchTitle={counter.matchTitle}
         maxOvers={counter.maxOvers}
@@ -59,8 +59,8 @@ export default function App() {
         completedOvers={counter.completedOvers}
       />
 
-      {/* Fixed-height content area — no scroll, everything visible */}
-      <main className="flex-1 flex flex-col p-3 gap-2.5 overflow-hidden">
+      {/* Exact viewport height minus header — no empty space at bottom */}
+      <main className="flex-1 flex flex-col p-2.5 gap-2 overflow-hidden min-h-0">
         {/* Compact merged scoreboard (score + over balls + chase) */}
         <ScoreDisplay
           totalRuns={counter.totalRuns}
