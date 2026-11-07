@@ -55,7 +55,7 @@ export function UmpireControls({
       <button
         disabled={disabled}
         onClick={() => { vibrateTap(); onToggleWicket(); }}
-        className={`w-full py-2.5 rounded-xl border font-black text-xs tracking-wider flex items-center justify-center gap-1.5 transition-all btn-tactile ${
+        className={`w-full py-3.5 sm:py-4 rounded-2xl border font-black text-sm tracking-wider flex items-center justify-center gap-2 transition-all btn-tactile ${
           wicketActive
             ? 'bg-rose-600 border-rose-400 text-white glow-wicket animate-pulse'
             : disabled
@@ -63,7 +63,7 @@ export function UmpireControls({
               : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-rose-500 hover:text-rose-400'
         }`}
       >
-        <span className="text-base">☠</span>
+        <span className="text-lg">☠</span>
         {wicketActive ? 'WICKET ACTIVE — SELECT BALL TYPE' : '+WICKET (TAP TO ARM)'}
       </button>
 
@@ -138,13 +138,13 @@ export function UmpireControls({
       <button
         disabled={!canUndo || isLocked}
         onClick={handleUndo}
-        className={`w-full py-2.5 rounded-xl border font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all btn-tactile ${
+        className={`w-full py-3.5 sm:py-4 rounded-2xl border font-black text-sm flex items-center justify-center gap-2 transition-all btn-tactile ${
           canUndo && !isLocked
             ? 'bg-slate-900 border-slate-700 text-sky-400 hover:bg-slate-800 hover:border-sky-500'
             : 'bg-slate-950 border-slate-900 text-slate-700 cursor-not-allowed opacity-50'
         }`}
       >
-        <RotateCcw className="w-3.5 h-3.5" />
+        <RotateCcw className="w-4 h-4" />
         UNDO LAST BALL (↩)
       </button>
     </div>
