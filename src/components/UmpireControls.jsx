@@ -5,7 +5,7 @@ import { useHaptics } from '../hooks/useHaptics';
 /**
  * Main umpire action panel.
  *
- * Compact, tactile button sizing tailored for mobile screens without forcing scroll.
+ * Runs and controls maintain the exact generous height/width whether in normal or wicket mode.
  */
 export function UmpireControls({
   onLegalBall,         // (runs, withWicket) => { overCompleted }
@@ -67,14 +67,14 @@ export function UmpireControls({
         {wicketActive ? 'WICKET ACTIVE — SELECT BALL TYPE' : '+WICKET (TAP TO ARM)'}
       </button>
 
-      {/* Run Buttons Grid (Compact 6-button grid) */}
+      {/* Run Buttons Grid - identical generous height & width in normal and wicket modes */}
       <div className="grid grid-cols-3 gap-2">
         {RUN_OPTIONS.map(({ runs, label, sub }) => (
           <button
             key={runs}
             disabled={disabled}
             onClick={() => handleLegal(runs)}
-            className={`flex flex-col items-center justify-center h-[72px] sm:h-[76px] rounded-2xl border font-black transition-all btn-tactile ${
+            className={`flex flex-col items-center justify-center py-3.5 sm:py-4 rounded-2xl border font-black transition-all btn-tactile ${
               disabled
                 ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
                 : wicketActive
@@ -86,13 +86,16 @@ export function UmpireControls({
                       : 'bg-gradient-to-b from-sky-600 to-sky-700 border-sky-400 text-white shadow-md'
             }`}
           >
+            {/* Line 1: Big Run label */}
             <span className="text-2xl sm:text-3xl font-black leading-tight">{label}</span>
-            <div className="flex items-center justify-center gap-1 mt-0.5 min-h-[14px]">
-              {sub && <span className="text-[10px] opacity-70 tracking-wider font-mono">{sub}</span>}
-              {wicketActive && (
-                <span className="text-[10px] text-rose-300 font-black">+W</span>
-              )}
-            </div>
+            {/* Line 2: Subtext (preserved height on all buttons) */}
+            <span className={`text-[10px] font-mono mt-0.5 ${sub ? 'opacity-70' : 'opacity-0 select-none'}`}>
+              {sub || '-'}
+            </span>
+            {/* Line 3: +W indicator (always occupies slot, visible when active) */}
+            <span className={`text-[10px] font-black mt-0.5 ${wicketActive ? 'text-rose-300' : 'opacity-0 select-none'}`}>
+              +W
+            </span>
           </button>
         ))}
       </div>
@@ -103,7 +106,7 @@ export function UmpireControls({
         <button
           disabled={disabled}
           onClick={() => handleExtra('WD')}
-          className={`h-[60px] sm:h-[64px] rounded-2xl border font-black flex flex-col items-center justify-center gap-0.5 shadow-md transition-all btn-tactile ${
+          className={`py-3.5 sm:py-4 rounded-2xl border font-black flex flex-col items-center justify-center gap-0.5 shadow-md transition-all btn-tactile ${
             disabled
               ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
               : wicketActive
@@ -121,7 +124,7 @@ export function UmpireControls({
         <button
           disabled={disabled}
           onClick={() => handleExtra('NB')}
-          className={`h-[60px] sm:h-[64px] rounded-2xl border font-black flex flex-col items-center justify-center gap-0.5 shadow-md transition-all btn-tactile ${
+          className={`py-3.5 sm:py-4 rounded-2xl border font-black flex flex-col items-center justify-center gap-0.5 shadow-md transition-all btn-tactile ${
             disabled
               ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
               : wicketActive
