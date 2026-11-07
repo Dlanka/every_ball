@@ -1,6 +1,10 @@
 import React from 'react';
 import { AlertCircle, Target, Zap } from 'lucide-react';
 
+/**
+ * Merged compact scoreboard + over balls + chase bar.
+ * Designed to leave maximum vertical space for action buttons below.
+ */
 export function ScoreDisplay({
   totalRuns,
   formattedOvers,
@@ -9,6 +13,7 @@ export function ScoreDisplay({
   maxOvers,
   maxWickets,
   isInningsCompleted,
+  currentOverBalls,
   // Target / Chase
   hasTarget,
   runsNeeded,
@@ -17,161 +22,174 @@ export function ScoreDisplay({
   isChaseWon,
   isChaseLost,
 }) {
-  const overProgressPercent = Math.min(100, Math.round((legalBallsInOver / 6) * 100));
-  const wicketProgressPercent = Math.min(100, Math.round((totalWickets / maxWickets) * 100));
   const isAllOut = totalWickets >= maxWickets;
 
-  // For chase bar color
+  // Over balls badge style
+  const getBadgeStyle = (ball) => {
+    if (!ball) return 'bg-slate-900 border-dashed border-slate-800 text-slate-700';
+    if (ball.withWicket) return 'bg-rose-700 border-rose-400 text-white';
+    switch (ball.type) {
+      case 'LEGAL':
+        if (ball.runs >= 4) return 'bg-emerald-500 border-emerald-300 text-slate-950';
+        if (ball.runs > 0)  return 'bg-sky-600 border-sky-400 text-white';
+        return 'bg-slate-700 border-slate-600 text-slate-300';
+      case 'WD':  return 'bg-amber-500 border-amber-300 text-slate-950';
+      case 'NB':  return 'bg-pink-600 border-pink-400 text-white';
+      case 'WICKET': return 'bg-rose-600 border-rose-400 text-white';
+      default:    return 'bg-slate-900 border-slate-800 text-slate-400';
+    }
+  };
+
+  const slots = Array.from({ length: Math.max(6, currentOverBalls.length) });
+
+  const isUrgent = hasTarget && ballsRemaining > 0 && runsNeeded > 0
+    && (runsNeeded / ballsRemaining) > 1.5;
+
   const runsNeededPercent = hasTarget
     ? Math.min(100, Math.round(((targetScore - runsNeeded) / targetScore) * 100))
     : 0;
-  const isUrgent = hasTarget && ballsRemaining > 0 && runsNeeded > 0
-    && (runsNeeded / ballsRemaining) > 1.5; // RRR > 9 — danger zone
 
   return (
-    <div className="space-y-2.5">
-      {/* ── Chase Won Banner ───────────────────────────────────────── */}
-      {isChaseWon && (
-        <div className="bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 border border-emerald-500/50 rounded-2xl p-3 text-center flex items-center justify-center gap-2">
-          <Zap className="w-5 h-5 text-emerald-400 shrink-0" />
-          <span className="text-sm font-black text-emerald-300 tracking-wider uppercase">
-            TARGET REACHED! 🏆
+    <div className="space-y-2">
+
+      {/* ── Banner (Chase won / Innings over) ────────────────── */}
+      {(isChaseWon || isInningsCompleted) && (
+        <div className={`rounded-xl p-2 text-center flex items-center justify-center gap-2 border ${
+          isChaseWon
+            ? 'bg-emerald-950/40 border-emerald-700/50'
+            : 'bg-amber-950/30 border-amber-700/40 animate-pulse'
+        }`}>
+          {isChaseWon
+            ? <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
+            : <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />}
+          <span className={`text-[11px] font-black uppercase tracking-widest ${isChaseWon ? 'text-emerald-300' : 'text-amber-300'}`}>
+            {isChaseWon
+              ? 'TARGET REACHED! 🏆'
+              : isChaseLost
+                ? `CHASE FAILED — Lost by ${runsNeeded} run${runsNeeded !== 1 ? 's' : ''}!`
+                : isAllOut ? 'INNINGS OVER — ALL OUT!' : 'INNINGS OVER — MAX OVERS!'}
           </span>
         </div>
       )}
 
-      {/* ── Innings Over / Chase Lost Banner ──────────────────────── */}
-      {!isChaseWon && isInningsCompleted && (
-        <div className="bg-gradient-to-r from-amber-500/20 via-rose-500/20 to-amber-500/20 border border-amber-500/40 rounded-2xl p-3 text-center flex items-center justify-center gap-2 animate-pulse">
-          <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
-          <span className="text-xs font-black text-amber-300 tracking-wider uppercase">
-            {isChaseLost
-              ? `CHASE FAILED — Lost by ${runsNeeded} run${runsNeeded !== 1 ? 's' : ''}!`
-              : isAllOut
-                ? 'INNINGS OVER — ALL OUT!'
-                : 'INNINGS OVER — MAX OVERS REACHED!'}
-          </span>
-        </div>
-      )}
+      {/* ── Single Merged Card ───────────────────────────────── */}
+      <div className="bg-umpire-card border border-umpire-border rounded-2xl shadow-xl overflow-hidden">
 
-      {/* ── Main Score Card ───────────────────────────────────────── */}
-      <div className="bg-umpire-card border border-umpire-border rounded-3xl p-3 shadow-2xl">
-        <div className="grid grid-cols-2 gap-2.5">
+        {/* Row 1 — Runs | Wickets | (Chase if target) */}
+        <div className={`grid gap-0 divide-x divide-slate-800 ${hasTarget && !isChaseWon ? 'grid-cols-3' : 'grid-cols-2'}`}>
 
           {/* RUNS */}
-          <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-3 py-2 flex flex-col justify-between">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">RUNS</span>
-            <div className="py-0.5">
-              <span className="text-4xl sm:text-5xl font-black font-mono text-white tracking-tight leading-none">
-                {totalRuns}
-              </span>
-            </div>
-            <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-wider">TOTAL SCORE</div>
+          <div className="px-3 py-2.5 flex flex-col gap-0.5">
+            <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">RUNS</span>
+            <span className="text-4xl font-black font-mono text-white leading-none">{totalRuns}</span>
+            <span className="text-[9px] text-slate-600 font-bold uppercase">TOTAL SCORE</span>
           </div>
 
           {/* WICKETS */}
-          <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-3 py-2 flex flex-col justify-between">
-            <div className="flex justify-between items-center">
-              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">WKTS</span>
-              <span className="text-[9px] font-extrabold font-mono text-rose-400 bg-rose-950/80 px-1.5 py-0.5 rounded-full border border-rose-800/60">
-                MAX {maxWickets}
+          <div className="px-3 py-2.5 flex flex-col gap-0.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">WKTS</span>
+              <span className="text-[8px] font-black text-rose-400 bg-rose-950/60 px-1.5 py-0.5 rounded-full border border-rose-900">
+                /{maxWickets}
               </span>
             </div>
-            <div className="flex items-baseline gap-1 py-0.5">
-              <span className="text-4xl sm:text-5xl font-black font-mono text-rose-500 tracking-tight leading-none">
-                {totalWickets}
-              </span>
-              <span className="text-slate-500 text-sm font-bold font-mono">/ {maxWickets}</span>
-            </div>
-            <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
+            <span className="text-4xl font-black font-mono text-rose-500 leading-none">{totalWickets}</span>
+            <div className="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
               <div
-                className="bg-gradient-to-r from-rose-500 to-red-600 h-full transition-all duration-300 rounded-full"
-                style={{ width: `${wicketProgressPercent}%` }}
+                className="bg-gradient-to-r from-rose-500 to-red-600 h-full transition-all"
+                style={{ width: `${Math.min(100, (totalWickets / maxWickets) * 100)}%` }}
               />
             </div>
           </div>
-        </div>
 
-        {/* Overs row */}
-        <div className="mt-2.5 bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-1.5 flex items-center justify-between">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-black font-mono text-sky-300">{formattedOvers}</span>
-            <span className="text-xs text-slate-500 font-bold font-mono">/ {maxOvers}.0 OVERS</span>
-          </div>
-          <div className="flex flex-col items-end gap-1 min-w-[80px]">
-            <span className="text-[10px] text-slate-500 font-bold font-mono">LEGAL {legalBallsInOver}/6</span>
-            <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
-              <div
-                className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-300 rounded-full"
-                style={{ width: `${overProgressPercent}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 2nd Innings Chase Bar (only if target is set) ─────────── */}
-      {hasTarget && !isChaseWon && (
-        <div className={`rounded-2xl border p-3 space-y-2 ${
-          isUrgent
-            ? 'bg-rose-950/30 border-rose-700/50'
-            : 'bg-amber-950/20 border-amber-700/30'
-        }`}>
-          {/* Target header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Target className={`w-4 h-4 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`} />
-              <span className={`text-[11px] font-extrabold uppercase tracking-widest ${isUrgent ? 'text-rose-300' : 'text-amber-300'}`}>
-                CHASING {targetScore}
-              </span>
-            </div>
-            <span className="text-[10px] font-bold text-slate-400 font-mono">
-              {ballsRemaining} ball{ballsRemaining !== 1 ? 's' : ''} left
-            </span>
-          </div>
-
-          {/* Big remaining display */}
-          <div className="flex items-end justify-between">
-            <div>
-              <div className={`text-3xl font-black font-mono leading-none ${
-                isUrgent ? 'text-rose-400' : 'text-amber-300'
-              }`}>
+          {/* CHASE (only if target set and not won) */}
+          {hasTarget && !isChaseWon && (
+            <div className={`px-3 py-2.5 flex flex-col gap-0.5 ${isUrgent ? 'bg-rose-950/20' : 'bg-amber-950/10'}`}>
+              <div className="flex items-center gap-1">
+                <Target className={`w-3 h-3 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`} />
+                <span className={`text-[9px] font-extrabold uppercase tracking-widest ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`}>
+                  NEED
+                </span>
+              </div>
+              <span className={`text-4xl font-black font-mono leading-none ${isUrgent ? 'text-rose-400' : 'text-amber-300'}`}>
                 {runsNeeded}
-              </div>
-              <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                runs needed
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-xl font-black font-mono text-slate-300 leading-none">
-                {ballsRemaining}
-              </div>
-              <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                balls rem.
-              </div>
-            </div>
-          </div>
-
-          {/* Chase progress bar */}
-          <div className="w-full bg-slate-900/80 rounded-full h-2 overflow-hidden border border-slate-800">
-            <div
-              className={`h-full transition-all duration-500 rounded-full ${
-                isUrgent
-                  ? 'bg-gradient-to-r from-rose-500 to-red-400'
-                  : 'bg-gradient-to-r from-amber-500 to-yellow-400'
-              }`}
-              style={{ width: `${runsNeededPercent}%` }}
-            />
-          </div>
-
-          {/* RRR */}
-          {ballsRemaining > 0 && runsNeeded > 0 && (
-            <div className="text-[10px] text-slate-500 font-mono text-right">
-              RRR: {((runsNeeded / ballsRemaining) * 6).toFixed(2)} per over
+              </span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase">{ballsRemaining}b left</span>
             </div>
           )}
         </div>
-      )}
+
+        {/* Divider */}
+        <div className="border-t border-slate-800" />
+
+        {/* Row 2 — Overs + Ball Progress + (RRR if chase) */}
+        <div className="px-3 py-2 flex items-center justify-between gap-2">
+          {/* Overs */}
+          <div className="flex items-baseline gap-1 shrink-0">
+            <span className="text-lg font-black font-mono text-sky-300 leading-none">{formattedOvers}</span>
+            <span className="text-[10px] text-slate-500 font-bold">/ {maxOvers}.0 OV</span>
+          </div>
+
+          {/* Ball dots */}
+          <div className="flex items-center gap-1 flex-1 justify-center">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className={`w-3 h-3 rounded-full border transition-all ${
+                  i < legalBallsInOver
+                    ? 'bg-emerald-400 border-emerald-300'
+                    : 'bg-slate-800 border-slate-700'
+                }`}
+              />
+            ))}
+            <span className="text-[9px] text-slate-600 font-bold ml-1">{legalBallsInOver}/6</span>
+          </div>
+
+          {/* RRR (if chasing) */}
+          {hasTarget && !isChaseWon && ballsRemaining > 0 && runsNeeded > 0 && (
+            <div className={`text-[10px] font-black font-mono shrink-0 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`}>
+              RRR {((runsNeeded / ballsRemaining) * 6).toFixed(1)}
+            </div>
+          )}
+        </div>
+
+        {/* Chase progress bar (thin, bottom of card) */}
+        {hasTarget && !isChaseWon && (
+          <div className={`h-1 w-full ${isUrgent ? 'bg-rose-950' : 'bg-amber-950/40'}`}>
+            <div
+              className={`h-full transition-all duration-500 ${isUrgent ? 'bg-rose-500' : 'bg-amber-400'}`}
+              style={{ width: `${runsNeededPercent}%` }}
+            />
+          </div>
+        )}
+
+        {/* Divider */}
+        <div className="border-t border-slate-800" />
+
+        {/* Row 3 — Current Over Balls */}
+        <div className="px-3 py-2">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 inline-block animate-pulse" />
+              CURRENT OVER
+            </span>
+            <span className="text-[9px] font-mono text-slate-600">{currentOverBalls.length} deliveries</span>
+          </div>
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+            {slots.map((_, i) => {
+              const ball = currentOverBalls[i];
+              return (
+                <div
+                  key={ball ? ball.id : `e-${i}`}
+                  className={`shrink-0 w-9 h-9 rounded-lg border flex items-center justify-center font-mono font-black text-[10px] transition-all ${getBadgeStyle(ball)}`}
+                >
+                  {ball ? ball.label : <span className="text-[10px] opacity-40">{i + 1}</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

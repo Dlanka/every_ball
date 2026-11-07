@@ -3,7 +3,6 @@ import { useUmpireCounter } from './hooks/useUmpireCounter';
 import { MatchSetup } from './components/MatchSetup';
 import { Header } from './components/Header';
 import { ScoreDisplay } from './components/ScoreDisplay';
-import { OverBallsVisual } from './components/OverBallsVisual';
 import { UmpireControls } from './components/UmpireControls';
 import { ExtraRunsModal } from './components/ExtraRunsModal';
 import { OverHistory } from './components/OverHistory';
@@ -60,7 +59,9 @@ export default function App() {
         completedOvers={counter.completedOvers}
       />
 
-      <main className="p-4 space-y-3 flex-1 overflow-y-auto pb-6">
+      {/* Fixed-height content area — no scroll, everything visible */}
+      <main className="flex-1 flex flex-col p-3 gap-2.5 overflow-hidden">
+        {/* Compact merged scoreboard (score + over balls + chase) */}
         <ScoreDisplay
           totalRuns={counter.totalRuns}
           formattedOvers={counter.formattedOvers}
@@ -69,6 +70,7 @@ export default function App() {
           maxOvers={counter.maxOvers}
           maxWickets={counter.maxWickets}
           isInningsCompleted={counter.isInningsCompleted}
+          currentOverBalls={counter.currentOverBalls}
           hasTarget={counter.hasTarget}
           runsNeeded={counter.runsNeeded}
           ballsRemaining={counter.ballsRemaining}
@@ -77,21 +79,19 @@ export default function App() {
           isChaseLost={counter.isChaseLost}
         />
 
-        <OverBallsVisual
-          currentOverBalls={counter.currentOverBalls}
-          legalBallsInOver={counter.legalBallsInOver}
-        />
-
-        <UmpireControls
-          onLegalBall={handleLegalBall}
-          onOpenExtra={handleOpenExtra}
-          onUndo={counter.undo}
-          canUndo={counter.canUndo}
-          isLocked={isLocked}
-          isInningsCompleted={counter.isInningsCompleted}
-          wicketActive={wicketActive}
-          onToggleWicket={() => setWicketActive(prev => !prev)}
-        />
+        {/* Action controls — take remaining space */}
+        <div className="flex-1 overflow-y-auto">
+          <UmpireControls
+            onLegalBall={handleLegalBall}
+            onOpenExtra={handleOpenExtra}
+            onUndo={counter.undo}
+            canUndo={counter.canUndo}
+            isLocked={isLocked}
+            isInningsCompleted={counter.isInningsCompleted}
+            wicketActive={wicketActive}
+            onToggleWicket={() => setWicketActive(prev => !prev)}
+          />
+        </div>
       </main>
 
       {/* Extra Runs Tray (WD / NB) */}

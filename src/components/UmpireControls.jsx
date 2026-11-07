@@ -52,12 +52,12 @@ export function UmpireControls({
   const disabled = isLocked || isInningsCompleted;
 
   return (
-    <div className="space-y-3 pt-1">
+    <div className="space-y-2">
       {/* Wicket Toggle */}
       <button
         disabled={disabled}
         onClick={() => { vibrateTap(); onToggleWicket(); }}
-        className={`w-full py-3 rounded-2xl border font-black text-sm tracking-wider flex items-center justify-center gap-2 transition-all btn-tactile ${
+        className={`w-full py-2.5 rounded-xl border font-black text-sm tracking-wider flex items-center justify-center gap-2 transition-all btn-tactile ${
           wicketActive
             ? 'bg-rose-600 border-rose-400 text-white glow-wicket animate-pulse'
             : disabled
@@ -70,13 +70,13 @@ export function UmpireControls({
       </button>
 
       {/* Run Buttons Grid */}
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-3 gap-2">
         {RUN_OPTIONS.map(({ runs, label, sub }) => (
           <button
             key={runs}
             disabled={disabled}
             onClick={() => handleLegal(runs)}
-            className={`flex flex-col items-center justify-center py-5 rounded-2xl border font-black transition-all btn-tactile ${
+            className={`flex flex-col items-center justify-center py-4 rounded-2xl border font-black transition-all btn-tactile ${
               disabled
                 ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
                 : wicketActive
@@ -98,12 +98,12 @@ export function UmpireControls({
       </div>
 
       {/* Extras Row */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         {/* WIDE */}
         <button
           disabled={disabled}
           onClick={() => handleExtra('WD')}
-          className={`py-5 rounded-2xl border font-black flex flex-col items-center justify-center gap-1 shadow-lg transition-all btn-tactile ${
+          className={`py-4 rounded-2xl border font-black flex flex-col items-center justify-center gap-1 shadow-lg transition-all btn-tactile ${
             disabled
               ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
               : wicketActive
@@ -121,7 +121,7 @@ export function UmpireControls({
         <button
           disabled={disabled}
           onClick={() => handleExtra('NB')}
-          className={`py-5 rounded-2xl border font-black flex flex-col items-center justify-center gap-1 shadow-lg transition-all btn-tactile ${
+          className={`py-4 rounded-2xl border font-black flex flex-col items-center justify-center gap-1 shadow-lg transition-all btn-tactile ${
             disabled
               ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed'
               : wicketActive
@@ -140,7 +140,7 @@ export function UmpireControls({
       <button
         disabled={!canUndo || isLocked}
         onClick={handleUndo}
-        className={`w-full py-4 rounded-2xl border font-extrabold text-sm flex items-center justify-center gap-2 transition-all btn-tactile ${
+        className={`w-full py-3 rounded-2xl border font-extrabold text-sm flex items-center justify-center gap-2 transition-all btn-tactile ${
           canUndo && !isLocked
             ? 'bg-slate-900 border-slate-700 text-sky-400 hover:bg-slate-800 hover:border-sky-500'
             : 'bg-slate-950 border-slate-900 text-slate-700 cursor-not-allowed opacity-50'
