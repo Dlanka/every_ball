@@ -60,7 +60,7 @@ export default function App() {
       />
 
       {/* Exact viewport height minus header — no empty space at bottom */}
-      <main className="flex-1 flex flex-col p-3 gap-2.5 overflow-hidden min-h-0">
+      <main className="flex-1 flex flex-col p-3 gap-2 overflow-hidden min-h-0 justify-between">
         {/* Compact merged scoreboard (score + over balls + chase) */}
         <ScoreDisplay
           totalRuns={counter.totalRuns}
@@ -79,19 +79,17 @@ export default function App() {
           isChaseLost={counter.isChaseLost}
         />
 
-        {/* Action controls — take remaining space */}
-        <div className="flex-1 flex flex-col min-h-0">
-          <UmpireControls
-            onLegalBall={handleLegalBall}
-            onOpenExtra={handleOpenExtra}
-            onUndo={counter.undo}
-            canUndo={counter.canUndo}
-            isLocked={isLocked}
-            isInningsCompleted={counter.isInningsCompleted}
-            wicketActive={wicketActive}
-            onToggleWicket={() => setWicketActive(prev => !prev)}
-          />
-        </div>
+        {/* Action controls */}
+        <UmpireControls
+          onLegalBall={handleLegalBall}
+          onOpenExtra={handleOpenExtra}
+          onUndo={counter.undo}
+          canUndo={counter.canUndo}
+          isLocked={isLocked}
+          isInningsCompleted={counter.isInningsCompleted}
+          wicketActive={wicketActive}
+          onToggleWicket={() => setWicketActive(prev => !prev)}
+        />
       </main>
 
       {/* Extra Runs Tray (WD / NB) */}
